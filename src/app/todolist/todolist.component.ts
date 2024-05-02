@@ -7,18 +7,28 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./todolist.component.css'],
 })
 export class TodolistComponent implements OnInit {
-  taskArray: { taskName: string; isCompleted: boolean; isEditable: boolean }[] =
-    [];
+  taskArray: {
+    id: number;
+    taskName: string;
+    isCompleted: boolean;
+    isEditable: boolean;
+  }[] = [];
+  nextId = 0;
 
   ngOnInit() {
     const storedTasks = localStorage.getItem('tasks');
     if (storedTasks) {
       this.taskArray = JSON.parse(storedTasks);
+      this.nextId =
+        this.taskArray.length > 0
+          ? Math.max(...this.taskArray.map((t) => t.id)) + 1
+          : 0;
     }
   }
 
   onSubmit(taskForm: NgForm) {
     this.taskArray.push({
+      id: this.nextId++,
       taskName: taskForm.value.task,
       isCompleted: false,
       isEditable: false,
@@ -27,25 +37,43 @@ export class TodolistComponent implements OnInit {
     this.saveTasks();
   }
 
-  onDelete(index: number) {
-    this.taskArray.splice(index, 1);
+  onDelete(id: number) {
+    this.taskArray = this.taskArray.filter((task) => task.id !== id);
     this.saveTasks();
   }
 
-  onCheck(index: number) {
-    this.taskArray[index].isCompleted = !this.taskArray[index].isCompleted;
-    this.saveTasks();
+  onCheck(id: number) {
+    const task = this.taskArray.find((task) => task.id === id);
+    if (task) {
+      task.isCompleted = !task.isCompleted;
+      this.saveTasks();
+    }
   }
 
-  onEdit(index: number) {
-    this.taskArray[index].isEditable = true;
-    this.saveTasks();
+  onEdit(id: number) {
+    const task = this.taskArray.find((task) => task.id === id);
+    if (task) {
+      task.isEditable = true;
+      this.saveTasks();
+    }
   }
 
-  onSave(index: number, updatedTask: string) {
-    this.taskArray[index].taskName = updatedTask;
-    this.taskArray[index].isEditable = false;
-    this.saveTasks();
+  onSave(id: number, updatedTask: string) {
+    const task = this.taskArray.find((task) => task.id === id);
+    if (task) {
+      task.taskName = updatedTask;
+      task.isEditable = false;
+      this.saveTasks();
+    }
+  }
+
+  refreshTasks() {
+    const storedTasks = localStorage.getItem('tasks');
+    if (storedTasks) {
+      this.taskArray = JSON.parse(storedTasks);
+    } else {
+      this.taskArray = [];
+    }
   }
 
   saveTasks() {
