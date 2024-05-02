@@ -12,6 +12,7 @@ export class TodolistComponent implements OnInit {
     taskName: string;
     isCompleted: boolean;
     isEditable: boolean;
+    isArchived: boolean;
   }[] = [];
   nextId = 0;
 
@@ -32,6 +33,7 @@ export class TodolistComponent implements OnInit {
       taskName: taskForm.value.task,
       isCompleted: false,
       isEditable: false,
+      isArchived: false,
     });
     taskForm.reset();
     this.saveTasks();
@@ -74,6 +76,26 @@ export class TodolistComponent implements OnInit {
     } else {
       this.taskArray = [];
     }
+    console.log(this.taskArray);
+  }
+
+  moveCompletedToArchive() {
+    this.taskArray.forEach((task) => {
+      if (task.isCompleted) {
+        task.isArchived = true;
+      }
+    });
+    this.saveTasks();
+  }
+
+  deleteArchivedTasks() {
+    this.taskArray = this.taskArray.filter((task) => !task.isArchived);
+    this.saveTasks();
+  }
+
+  deleteAllTasks() {
+    this.taskArray = [];
+    this.saveTasks();
   }
 
   saveTasks() {

@@ -27,82 +27,123 @@
     >
       Submit
     </button>
-    <button
-      type="button"
-      class="btn btn-primary mt-2 ms-3"
-      (click)="refreshTasks()"
-    >
-      Refresh Tasks
-    </button>
   </form>
 
   <hr />
 
+  <h2>Current Tasks</h2>
   <table class="table">
     <thead>
       <tr>
+        <th scope="col">#</th>
         <th scope="col">Task</th>
         <th scope="col">Completed</th>
-        <th scope="col">Delete</th>
-        <th scope="col">Edit</th>
-        <th scope="col">Save</th>
+        <th scope="col">Actions</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let t of taskArray; index as i">
-        <td>
-          <input
-            #taskInput
-            type="text"
-            class="form-control"
-            id="taskInTable"
-            [value]="t.taskName"
-            [readOnly]="!t.isEditable"
-            [ngClass]="{
-              edit: t.isEditable,
-              'not-edit': !t.isEditable,
-              crossed: t.isCompleted
-            }"
-          />
-        </td>
-        <td>
-          <input
-            (change)="onCheck(i)"
-            type="checkbox"
-            [checked]="t.isCompleted"
-            class="ms-3"
-          />
-        </td>
-        <td>
-          <button
-            id="delete"
-            class="btn btn-danger btn-sm"
-            (click)="onDelete(t.id)"
-          >
-            Delete
-          </button>
-        </td>
-        <td>
-          <button
-            id="edit"
-            class="btn btn-primary btn-sm"
-            (click)="onEdit(t.id)"
-            [disabled]="t.isEditable"
-          >
-            Edit
-          </button>
-        </td>
-        <td>
-          <button
-            id="save"
-            class="btn btn-warning btn-sm"
-            (click)="onSave(t.id, taskInput.value)"
-            [disabled]="!t.isEditable"
-          >
-            Save
-          </button>
-        </td>
-      </tr>
+      <ng-container *ngFor="let t of taskArray; index as i">
+        <tr *ngIf="!t.isArchived">
+          <th scope="row">{{ i + 1 }}</th>
+          <td>
+            <input
+              #taskInput
+              type="text"
+              class="form-control"
+              id="taskInTable"
+              [value]="t.taskName"
+              [readOnly]="!t.isEditable"
+              [ngClass]="{
+                edit: t.isEditable,
+                'not-edit': !t.isEditable,
+                crossed: t.isCompleted
+              }"
+            />
+          </td>
+          <td>
+            <input
+              (change)="onCheck(t.id)"
+              type="checkbox"
+              [checked]="t.isCompleted"
+              class="ms-3"
+            />
+          </td>
+          <td>
+            <button
+              id="delete"
+              class="btn btn-danger btn-sm me-2"
+              (click)="onDelete(t.id)"
+            >
+              Delete
+            </button>
+            <button
+              id="edit"
+              class="btn btn-primary btn-sm me-2"
+              (click)="onEdit(t.id)"
+              [disabled]="t.isEditable"
+            >
+              Edit
+            </button>
+            <button
+              id="save"
+              class="btn btn-warning btn-sm"
+              (click)="onSave(t.id, taskInput.value)"
+              [disabled]="!t.isEditable"
+            >
+              Save
+            </button>
+          </td>
+        </tr></ng-container
+      >
     </tbody>
   </table>
+
+  <button
+    type="button"
+    class="btn btn-primary mt-2 ms-3"
+    (click)="refreshTasks()"
+  >
+    Refresh Tasks
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary mt-2 ms-3"
+    (click)="moveCompletedToArchive()"
+  >
+    Move Completed to Archive
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary mt-2 ms-3"
+    (click)="deleteArchivedTasks()"
+  >
+    Delete Archived tasks
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary mt-2 ms-3"
+    (click)="deleteAllTasks()"
+  >
+    Delete All
+  </button>
+
+  <h2 class="mt-5">Archived Tasks</h2>
+  <div class="mt-4" id="archiveTable">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Task</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let task of taskArray; index as i">
+          <tr *ngIf="task.isArchived">
+            <th scope="row">{{ i + 1 }}</th>
+            <td>{{ task.taskName }}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
 </div>
