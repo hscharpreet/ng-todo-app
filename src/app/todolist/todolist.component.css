@@ -4,18 +4,6 @@ h1 {
   margin-top: 20px;
 }
 
-#submitForm {
-  margin-top: 40px;
-}
-
-#submitButton {
-  margin-top: 20px;
-}
-
-#myCheckbox {
-  margin-left: 30px;
-}
-
 #taskInTable {
   max-width: 300px;
 }
