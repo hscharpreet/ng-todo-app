@@ -7,14 +7,14 @@ import { NgForm } from '@angular/forms';
   styleUrl: './todolist.component.css',
 })
 export class TodolistComponent {
-  taskArray = [{ taskName: 'Task 1', isCompleted: true }];
+  taskArray = [{ taskName: 'Task 1', isCompleted: true, isEditable: false }];
 
   onSubmit(taskForm: NgForm) {
-    console.log(taskForm);
     this.taskArray.push({
       taskName: taskForm.value.task,
       // taskName: taskForm.controls['task'].value,
       isCompleted: false,
+      isEditable: false,
     });
     taskForm.reset();
   }
@@ -27,7 +27,12 @@ export class TodolistComponent {
     this.taskArray[index].isCompleted = !this.taskArray[index].isCompleted;
   }
 
-  onEdit(index: number) {}
+  onEdit(index: number) {
+    this.taskArray[index].isEditable = true;
+  }
 
-  onSave(index: number) {}
+  onSave(index: number, updatedTask: string) {
+    this.taskArray[index].taskName = updatedTask;
+    this.taskArray[index].isEditable = false;
+  }
 }

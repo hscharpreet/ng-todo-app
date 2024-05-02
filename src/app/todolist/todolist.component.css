@@ -25,3 +25,15 @@ h1 {
 #save {
   width: 60px;
 }
+
+.edit {
+  border: solid 2px orange;
+}
+
+.not-edit {
+  border: none;
+}
+
+.crossed {
+  text-decoration: line-through;
+}

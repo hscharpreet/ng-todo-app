@@ -45,10 +45,17 @@
       <tr *ngFor="let t of taskArray; index as i">
         <td>
           <input
+            #taskInput
             type="text"
             class="form-control"
             id="taskInTable"
             value="{{ t.taskName }}"
+            [readOnly]="!t.isEditable"
+            [ngClass]="{
+              edit: t.isEditable,
+              'not-edit': !t.isEditable,
+              crossed: t.isCompleted
+            }"
           />
         </td>
         <td>
@@ -69,12 +76,22 @@
           </button>
         </td>
         <td>
-          <button id="edit" class="btn btn-primary btn-sm" (click)="onEdit(i)">
+          <button
+            id="edit"
+            class="btn btn-primary btn-sm"
+            (click)="onEdit(i)"
+            [disabled]="t.isEditable"
+          >
             Edit
           </button>
         </td>
         <td>
-          <button id="save" class="btn btn-warning btn-sm" (click)="onSave(i)">
+          <button
+            id="save"
+            class="btn btn-warning btn-sm"
+            (click)="onSave(i, taskInput.value)"
+            [disabled]="!t.isEditable"
+          >
             Save
           </button>
         </td>
