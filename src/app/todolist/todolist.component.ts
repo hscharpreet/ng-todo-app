@@ -1,6 +1,7 @@
 import {
   Component,
   ElementRef,
+  HostListener,
   OnInit,
   QueryList,
   ViewChildren,
@@ -24,6 +25,18 @@ export class TodolistComponent implements OnInit {
 
   @ViewChildren('taskInput') taskInputs: QueryList<ElementRef> | undefined;
 
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    if (event.ctrlKey && event.key === 'z') {
+      this.undo();
+    } else if (event.ctrlKey && event.key === 'y') {
+      this.redo();
+    }
+  }
+
+  previousStates: any[] = [];
+  futureStates: any[] = [];
+
   ngOnInit() {
     const storedTasks = localStorage.getItem('tasks');
     if (storedTasks) {
@@ -36,6 +49,7 @@ export class TodolistComponent implements OnInit {
   }
 
   onSubmit(taskForm: NgForm) {
+    this.savePreviousState();
     this.taskArray.push({
       id: this.nextId++,
       taskName: taskForm.value.task,
@@ -48,11 +62,13 @@ export class TodolistComponent implements OnInit {
   }
 
   onDelete(id: number) {
+    this.savePreviousState();
     this.taskArray = this.taskArray.filter((task) => task.id !== id);
     this.saveTasks();
   }
 
   onCheck(id: number) {
+    this.savePreviousState();
     const task = this.taskArray.find((task) => task.id === id);
     if (task) {
       task.isCompleted = !task.isCompleted;
@@ -69,6 +85,7 @@ export class TodolistComponent implements OnInit {
   }
 
   onEdit(id: number) {
+    this.savePreviousState();
     const task = this.taskArray.find((task) => task.id === id);
     if (task) {
       task.isEditable = true;
@@ -85,6 +102,7 @@ export class TodolistComponent implements OnInit {
   }
 
   onSave(id: number, updatedTask: string) {
+    this.savePreviousState();
     const task = this.taskArray.find((task) => task.id === id);
     if (task) {
       task.taskName = updatedTask;
@@ -104,6 +122,7 @@ export class TodolistComponent implements OnInit {
   }
 
   moveCompletedToArchive() {
+    this.savePreviousState();
     this.taskArray.forEach((task) => {
       if (task.isCompleted) {
         task.isArchived = true;
@@ -120,6 +139,26 @@ export class TodolistComponent implements OnInit {
   deleteAllTasks() {
     this.taskArray = [];
     this.saveTasks();
+  }
+
+  savePreviousState() {
+    this.previousStates.push(JSON.parse(JSON.stringify(this.taskArray)));
+  }
+
+  undo() {
+    if (this.previousStates.length > 0) {
+      this.futureStates.push(JSON.parse(JSON.stringify(this.taskArray)));
+      this.taskArray = this.previousStates.pop();
+      this.saveTasks();
+    }
+  }
+
+  redo() {
+    if (this.futureStates.length > 0) {
+      this.previousStates.push(JSON.parse(JSON.stringify(this.taskArray)));
+      this.taskArray = this.futureStates.pop();
+      this.saveTasks();
+    }
   }
 
   saveTasks() {

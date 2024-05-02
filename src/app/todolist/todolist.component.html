@@ -105,11 +105,17 @@
 
   <h2 class="text-center display-6 mt-5">Archived Tasks</h2>
 
-  <div class="row justify-content-center">
-    <div class="btn-group-sm col-6" role="group">
+  <div class="btn-toolbar justify-content-center">
+    <div class="btn-group-sm" role="group">
+      <button type="button" class="btn btn-primary me-2" (click)="undo()">
+        Undo Actions
+      </button>
+      <button type="button" class="btn btn-primary me-2" (click)="redo()">
+        Redo Actions
+      </button>
       <button
         type="button"
-        class="btn btn-primary me-2"
+        class="btn btn-success me-2"
         (click)="refreshTasks()"
       >
         Refresh Tasks
