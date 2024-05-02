@@ -26,4 +26,8 @@ export class TodolistComponent {
   onCheck(index: number) {
     this.taskArray[index].isCompleted = !this.taskArray[index].isCompleted;
   }
+
+  onEdit(index: number) {}
+
+  onSave(index: number) {}
 }
