@@ -2,16 +2,27 @@
   <h1 class="mt-4">To-Do Application</h1>
   <hr />
   <form (ngSubmit)="onSubmit(taskForm)" #taskForm="ngForm" class="mt-4">
-    <div class="form-group">
-      <input
-        type="text"
-        class="form-control"
-        id="task"
-        placeholder="Enter task"
-        ngModel
-        name="task"
-        required
-      />
+    <div class="form-group row justify-content-center">
+      <div class="col-6">
+        <input
+          type="text"
+          class="form-control col-10"
+          id="task"
+          placeholder="Enter task"
+          ngModel
+          name="task"
+          required
+        />
+      </div>
+      <div class="col-2">
+        <button
+          type="submit"
+          class="btn btn-primary col"
+          [disabled]="taskForm.invalid"
+        >
+          Submit
+        </button>
+      </div>
       <small
         id="errorMessage"
         class="form-text text-danger mt-1"
@@ -20,130 +31,167 @@
         Required Field
       </small>
     </div>
-    <button
-      type="submit"
-      class="btn btn-primary mt-2"
-      [disabled]="taskForm.invalid"
-    >
-      Submit
-    </button>
   </form>
 
   <hr />
 
-  <h2>Current Tasks</h2>
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Task</th>
-        <th scope="col">Completed</th>
-        <th scope="col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let t of taskArray; index as i">
-        <tr *ngIf="!t.isArchived">
-          <th scope="row">{{ i + 1 }}</th>
-          <td>
-            <input
-              #taskInput
-              type="text"
-              class="form-control"
-              id="taskInTable"
-              [value]="t.taskName"
-              [readOnly]="!t.isEditable"
-              [ngClass]="{
-                edit: t.isEditable,
-                'not-edit': !t.isEditable,
-                crossed: t.isCompleted
-              }"
-            />
-          </td>
-          <td>
-            <input
-              (change)="onCheck(t.id)"
-              type="checkbox"
-              [checked]="t.isCompleted"
-              class="ms-3"
-            />
-          </td>
-          <td>
-            <button
-              id="delete"
-              class="btn btn-danger btn-sm me-2"
-              (click)="onDelete(t.id)"
-            >
-              Delete
-            </button>
-            <button
-              id="edit"
-              class="btn btn-primary btn-sm me-2"
-              (click)="onEdit(t.id)"
-              [disabled]="t.isEditable"
-            >
-              Edit
-            </button>
-            <button
-              id="save"
-              class="btn btn-warning btn-sm"
-              (click)="onSave(t.id, taskInput.value)"
-              [disabled]="!t.isEditable"
-            >
-              Save
-            </button>
-          </td>
-        </tr></ng-container
+  <h3 class="text-center display-5">Current Tasks</h3>
+
+  <div class="col" *ngFor="let t of taskArray; index as i">
+    <div
+      class="form-group row justify-content-center mt-2"
+      *ngIf="!t.isArchived"
+    >
+      <div class="col-4">
+        <input
+          #taskInput
+          type="text"
+          class="form-control"
+          [value]="t.taskName"
+          [readOnly]="!t.isEditable"
+          [ngClass]="{
+            edit: t.isEditable,
+            'not-edit': !t.isEditable,
+            crossed: t.isCompleted
+          }"
+          (keyup.enter)="onSave(t.id, taskInput.value)"
+        />
+      </div>
+      <div class="col-2">
+        <div class="btn-group mr-2" role="group" style="width: 250px">
+          <button
+            type="button"
+            class="btn btn-outline-success w-50"
+            (click)="onCheck(t.id)"
+            *ngIf="!t.isCompleted"
+          >
+            Done
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-warning w-50"
+            (click)="onCheck(t.id)"
+            *ngIf="t.isCompleted"
+          >
+            UnCheck
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-primary w-25"
+            (click)="onEdit(t.id)"
+            *ngIf="!t.isEditable"
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-warning w-25"
+            (click)="onSave(t.id, taskInput.value)"
+            *ngIf="t.isEditable"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-danger w-25"
+            (click)="onDelete(t.id)"
+          >
+            Del
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="text-center display-6 mt-5">Archived Tasks</h2>
+
+  <div class="row justify-content-center">
+    <div class="btn-group-sm col-6" role="group">
+      <button
+        type="button"
+        class="btn btn-primary me-2"
+        (click)="refreshTasks()"
       >
-    </tbody>
-  </table>
+        Refresh Tasks
+      </button>
+      <button
+        type="button"
+        class="btn btn-warning me-2"
+        (click)="moveCompletedToArchive()"
+      >
+        Move Complete to Archive
+      </button>
+      <button
+        type="button"
+        class="btn btn-warning me-2"
+        (click)="deleteArchivedTasks()"
+      >
+        Delete Archived tasks
+      </button>
+      <button
+        type="button"
+        class="btn btn-danger me-2"
+        (click)="deleteAllTasks()"
+      >
+        Delete All
+      </button>
+    </div>
+  </div>
 
-  <button
-    type="button"
-    class="btn btn-primary mt-2 ms-3"
-    (click)="refreshTasks()"
-  >
-    Refresh Tasks
-  </button>
-  <button
-    type="button"
-    class="btn btn-primary mt-2 ms-3"
-    (click)="moveCompletedToArchive()"
-  >
-    Move Completed to Archive
-  </button>
-  <button
-    type="button"
-    class="btn btn-primary mt-2 ms-3"
-    (click)="deleteArchivedTasks()"
-  >
-    Delete Archived tasks
-  </button>
-  <button
-    type="button"
-    class="btn btn-primary mt-2 ms-3"
-    (click)="deleteAllTasks()"
-  >
-    Delete All
-  </button>
-
-  <h2 class="mt-5">Archived Tasks</h2>
-  <div class="mt-4" id="archiveTable">
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Task</th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngFor="let task of taskArray; index as i">
-          <tr *ngIf="task.isArchived">
-            <th scope="row">{{ i + 1 }}</th>
-            <td>{{ task.taskName }}</td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
+  <div class="col" *ngFor="let t of taskArray; index as i">
+    <div
+      class="form-group row justify-content-center mt-2"
+      *ngIf="t.isArchived"
+    >
+      <div class="col-4">
+        <input
+          #taskInput
+          type="text"
+          class="form-control"
+          [value]="t.taskName"
+          [readOnly]="!t.isEditable"
+          [ngClass]="{
+            edit: t.isEditable,
+            'not-edit': !t.isEditable,
+            crossed: t.isCompleted
+          }"
+          (keyup.enter)="onSave(t.id, taskInput.value)"
+        />
+      </div>
+      <div class="col-2">
+        <div class="btn-group mr-2" role="group" style="width: 250px">
+          <button
+            type="button"
+            class="btn btn-outline-warning w-50"
+            (click)="onUndoCheck(t.id)"
+          >
+            Undo
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-primary w-25"
+            (click)="onEdit(t.id)"
+            *ngIf="!t.isEditable"
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-warning w-25"
+            (click)="onSave(t.id, taskInput.value)"
+            *ngIf="t.isEditable"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-danger w-25"
+            (click)="onDelete(t.id)"
+          >
+            Del
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

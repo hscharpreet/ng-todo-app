@@ -20,8 +20,10 @@ h1 {
 
 .not-edit {
   border: none;
+  font-weight: bold;
 }
 
 .crossed {
   text-decoration: line-through;
+  font-weight: normal;
 }

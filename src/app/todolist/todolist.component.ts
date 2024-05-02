@@ -1,4 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { NgForm } from '@angular/forms';
 
 @Component({
@@ -15,6 +21,8 @@ export class TodolistComponent implements OnInit {
     isArchived: boolean;
   }[] = [];
   nextId = 0;
+
+  @ViewChildren('taskInput') taskInputs: QueryList<ElementRef> | undefined;
 
   ngOnInit() {
     const storedTasks = localStorage.getItem('tasks');
@@ -52,11 +60,27 @@ export class TodolistComponent implements OnInit {
     }
   }
 
+  onUndoCheck(id: number) {
+    const task = this.taskArray.find((task) => task.id === id);
+    if (task) {
+      task.isArchived = !task.isArchived;
+      this.saveTasks();
+    }
+  }
+
   onEdit(id: number) {
     const task = this.taskArray.find((task) => task.id === id);
     if (task) {
       task.isEditable = true;
       this.saveTasks();
+      setTimeout(() => {
+        const taskInput = this.taskInputs?.find(
+          (input) => input.nativeElement.value === task.taskName
+        );
+        if (taskInput) {
+          taskInput.nativeElement.focus();
+        }
+      });
     }
   }
 
