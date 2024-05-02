@@ -44,7 +44,12 @@
       <tr *ngFor="let t of taskArray; index as i">
         <td>{{ t.taskName }}</td>
         <td>
-          <input id="myCheckbox" type="checkbox" [checked]="t.isCompleted" />
+          <input
+            (change)="onCheck(i)"
+            id="myCheckbox"
+            type="checkbox"
+            [checked]="t.isCompleted"
+          />
         </td>
         <td>
           <button class="btn btn-danger btn-sm" (click)="onDelete(i)">

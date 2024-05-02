@@ -22,4 +22,8 @@ export class TodolistComponent {
   onDelete(index: number) {
     this.taskArray.splice(index, 1);
   }
+
+  onCheck(index: number) {
+    this.taskArray[index].isCompleted = !this.taskArray[index].isCompleted;
+  }
 }
