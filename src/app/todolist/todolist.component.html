@@ -1,11 +1,11 @@
 <div class="container">
   <h1>
-    To-do list<i
+    Todo - list<i
       class="bi bi-cloud-arrow-up ms-2"
       *ngIf="!isSaved"
       (click)="saveAndCopyUrl()"
     ></i>
-    <i class="bi bi-check2-circle ms-2" *ngIf="isSaved"></i>
+    <i class="bi bi-cloud-check-fill text-success ms-2" *ngIf="isSaved"></i>
   </h1>
   <hr />
   <form (ngSubmit)="onSubmit(taskForm)" #taskForm="ngForm" class="mt-4">
@@ -171,8 +171,9 @@
 </div>
 
 <div class="fixed-bottom bg-secondary-subtle">
-  <div class="btn-toolbar justify-content-center">
-    <div class="btn-group-sm mt-1" role="group">
+  <p class="text-center m-auto" *ngIf="toastMessage">{{ toastMessage }}</p>
+  <div class="btn-toolbar justify-content-center mt-1">
+    <div class="btn-group-sm" role="group">
       <button
         type="button"
         class="btn btn-primary me-2"
@@ -198,7 +199,7 @@
       </button>
       <button
         type="button"
-        class="btn btn-warning m-1"
+        class="btn btn-secondary m-1"
         (click)="showMore = !showMore"
         *ngIf="!isLargeScreen"
       >
@@ -210,6 +211,9 @@
       </button>
     </div>
     <div *ngIf="showMore" class="btn-group-sm" role="group">
+      <button type="button" class="btn btn-success m-1" (click)="saveToDB()">
+        <i class="bi bi-cloud-arrow-up"></i> Save to DB
+      </button>
       <button
         type="button"
         class="btn btn-success m-1"
@@ -230,9 +234,6 @@
         (click)="deleteAllTasks()"
       >
         <i class="bi bi-trash3-fill"></i> Delete All
-      </button>
-      <button type="button" class="btn btn-success m-1" (click)="saveToDB()">
-        <i class="bi bi-floppy"></i> Save to DB
       </button>
     </div>
   </div>

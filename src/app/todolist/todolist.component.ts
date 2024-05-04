@@ -33,6 +33,7 @@ export class TodolistComponent implements OnInit {
   isLargeScreen = false;
   idFromUrl: string = '';
   isSaved = false;
+  toastMessage: string | null = null;
 
   @ViewChildren('taskInput') taskInputs: QueryList<ElementRef> | undefined;
 
@@ -60,7 +61,7 @@ export class TodolistComponent implements OnInit {
 
       const docRef = doc(this.firestore, 'todos', this.idFromUrl);
       await setDoc(docRef, { tasks: this.taskArray });
-      console.log('Document written with ID: ', this.idFromUrl);
+      this.showToastMessage(`Saved to cloud with id: ${this.idFromUrl}`, 2000);
     } catch (e) {
       console.error('Error adding document: ', e);
     }
@@ -103,6 +104,7 @@ export class TodolistComponent implements OnInit {
     this.savePreviousState();
     this.taskArray = this.taskArray.filter((task) => task.id !== id);
     this.saveTasks();
+    this.showToastMessage(`Task Deleted. Undo to revert action.`, 1000);
   }
 
   onCheck(id: number) {
@@ -178,6 +180,14 @@ export class TodolistComponent implements OnInit {
 
   savePreviousState() {
     this.previousStates.push(JSON.parse(JSON.stringify(this.taskArray)));
+  }
+
+  showToastMessage(message: string, timeout: number) {
+    this.toastMessage = message;
+
+    setTimeout(() => {
+      this.toastMessage = null;
+    }, timeout);
   }
 
   undo() {
