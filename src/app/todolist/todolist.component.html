@@ -61,7 +61,7 @@
             'not-edit': !t.isEditable,
             crossed: t.isCompleted
           }"
-          (keyup.enter)="onSave(t.id, taskInput.value)"
+          (keyup.enter)="onSaveCurrentTask(t.id, taskInput.value)"
         />
       </div>
       <div class="col-4 col-md-2">
@@ -93,7 +93,7 @@
           <button
             type="button"
             class="btn btn-outline-warning"
-            (click)="onSave(t.id, taskInput.value)"
+            (click)="onSaveCurrentTask(t.id, taskInput.value)"
             *ngIf="t.isEditable"
           >
             <i class="bi bi-floppy"></i>
@@ -129,7 +129,7 @@
             'not-edit': !t.isEditable,
             crossed: t.isCompleted
           }"
-          (keyup.enter)="onSave(t.id, taskInput.value)"
+          (keyup.enter)="onSaveCurrentTask(t.id, taskInput.value)"
         />
       </div>
       <div class="col-4 col-md-2">
@@ -152,7 +152,7 @@
           <button
             type="button"
             class="btn btn-outline-warning"
-            (click)="onSave(t.id, taskInput.value)"
+            (click)="onSaveCurrentTask(t.id, taskInput.value)"
             *ngIf="t.isEditable"
           >
             <i class="bi bi-floppy"></i>

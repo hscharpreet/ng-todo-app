@@ -10,6 +10,7 @@ import { Firestore } from '@angular/fire/firestore';
 import { NgForm } from '@angular/forms';
 import { setDoc, doc, getDoc } from 'firebase/firestore';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Timestamp } from 'firebase/firestore';
 
 interface Task {
   id: number;
@@ -17,6 +18,12 @@ interface Task {
   isCompleted: boolean;
   isEditable: boolean;
   isArchived: boolean;
+  lastModified?: Timestamp;
+}
+
+interface FirestoreData {
+  tasks: Task[];
+  lastModified: Timestamp;
 }
 
 @Component({
@@ -60,7 +67,13 @@ export class TodolistComponent implements OnInit {
       }
 
       const docRef = doc(this.firestore, 'todos', this.idFromUrl);
-      await setDoc(docRef, { tasks: this.taskArray });
+      await setDoc(docRef, {
+        tasks: this.taskArray.map((task) => ({
+          ...task,
+          lastModified: task.lastModified || Timestamp.now(),
+        })),
+        lastModified: Timestamp.now(),
+      });
       this.showToastMessage(`Saved to cloud with id: ${this.idFromUrl}`, 2000);
     } catch (e) {
       console.error('Error adding document: ', e);
@@ -94,6 +107,7 @@ export class TodolistComponent implements OnInit {
       isCompleted: false,
       isEditable: false,
       isArchived: false,
+      lastModified: Timestamp.now(),
     };
     this.taskArray.push(newTask);
     taskForm.reset();
@@ -141,7 +155,7 @@ export class TodolistComponent implements OnInit {
     }
   }
 
-  onSave(id: number, updatedTask: string) {
+  onSaveCurrentTask(id: number, updatedTask: string) {
     this.savePreviousState();
     const task = this.taskArray.find((task) => task.id === id);
     if (task) {
@@ -179,7 +193,13 @@ export class TodolistComponent implements OnInit {
   }
 
   savePreviousState() {
-    this.previousStates.push(JSON.parse(JSON.stringify(this.taskArray)));
+    if (
+      this.previousStates.length === 0 ||
+      JSON.stringify(this.taskArray) !==
+        JSON.stringify(this.previousStates[this.previousStates.length - 1])
+    ) {
+      this.previousStates.push(JSON.parse(JSON.stringify(this.taskArray)));
+    }
   }
 
   showToastMessage(message: string, timeout: number) {
@@ -208,6 +228,7 @@ export class TodolistComponent implements OnInit {
 
   saveTasks() {
     localStorage.setItem('tasks', JSON.stringify(this.taskArray));
+    localStorage.setItem('lastModified', Date.now().toString());
   }
 
   async loadTasks() {
@@ -216,11 +237,25 @@ export class TodolistComponent implements OnInit {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        this.taskArray = docSnap.data()['tasks'];
-        this.nextId =
-          this.taskArray.length > 0
-            ? Math.max(...this.taskArray.map((t) => t.id)) + 1
-            : 0;
+        const firestoreData = docSnap.data();
+        if (firestoreData) {
+          const firestoreTasks = firestoreData as FirestoreData;
+          const localData = this.loadTasksFromLocalStorage();
+
+          if (
+            firestoreTasks['lastModified'].toDate().getTime() >
+            localData.lastModified
+          ) {
+            this.taskArray = firestoreTasks.tasks;
+          } else {
+            this.taskArray = localData.tasks;
+          }
+
+          this.nextId =
+            this.taskArray.length > 0
+              ? Math.max(...this.taskArray.map((t) => t.id)) + 1
+              : 0;
+        }
       } else {
         this.loadTasksFromLocalStorage();
       }
@@ -229,17 +264,16 @@ export class TodolistComponent implements OnInit {
     }
   }
 
-  loadTasksFromLocalStorage() {
+  loadTasksFromLocalStorage(): { tasks: Task[]; lastModified: number } {
     const storedTasks = localStorage.getItem('tasks');
+    let tasks: Task[] = [];
     if (storedTasks) {
-      this.taskArray = JSON.parse(storedTasks);
-      this.nextId =
-        this.taskArray.length > 0
-          ? Math.max(...this.taskArray.map((t) => t.id)) + 1
-          : 0;
-    } else {
-      this.taskArray = [];
-      this.nextId = 0;
+      tasks = JSON.parse(storedTasks);
     }
+    this.taskArray = tasks;
+    this.nextId =
+      tasks.length > 0 ? Math.max(...tasks.map((t) => t.id)) + 1 : 0;
+    const lastModified = localStorage.getItem('lastModified');
+    return { tasks, lastModified: lastModified ? Number(lastModified) : 0 };
   }
 }
