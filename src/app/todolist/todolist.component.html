@@ -171,8 +171,8 @@
 </div>
 
 <div class="fixed-bottom bg-secondary-subtle">
-  <div class="btn-toolbar justify-content-center mb-2">
-    <div class="btn-group-sm mt-2" role="group">
+  <div class="btn-toolbar justify-content-center">
+    <div class="btn-group-sm mt-1" role="group">
       <button
         type="button"
         class="btn btn-primary me-2"
@@ -183,7 +183,7 @@
       </button>
       <button
         type="button"
-        class="btn btn-primary me-2"
+        class="btn btn-primary m-1"
         (click)="redo()"
         [disabled]="futureStates.length === 0"
       >
@@ -191,14 +191,14 @@
       </button>
       <button
         type="button"
-        class="btn btn-warning me-2"
+        class="btn btn-warning m-1"
         (click)="moveCompletedToArchive()"
       >
         <i class="bi bi-arrow-down-square"></i> Archive
       </button>
       <button
         type="button"
-        class="btn btn-warning me-2"
+        class="btn btn-warning m-1"
         (click)="showMore = !showMore"
         *ngIf="!isLargeScreen"
       >
@@ -209,29 +209,29 @@
         {{ showMore ? "Less" : "More" }}
       </button>
     </div>
-    <div *ngIf="showMore" class="btn-group-sm mt-2" role="group">
+    <div *ngIf="showMore" class="btn-group-sm" role="group">
       <button
         type="button"
-        class="btn btn-success me-2"
+        class="btn btn-success m-1"
         (click)="refreshTasks()"
       >
         <i class="bi bi-arrow-clockwise"></i> Refresh
       </button>
       <button
         type="button"
-        class="btn btn-warning me-2"
+        class="btn btn-warning m-1"
         (click)="deleteArchivedTasks()"
       >
         <i class="bi bi-trash3"></i> Delete Archived
       </button>
       <button
         type="button"
-        class="btn btn-danger me-2"
+        class="btn btn-danger m-1"
         (click)="deleteAllTasks()"
       >
         <i class="bi bi-trash3-fill"></i> Delete All
       </button>
-      <button type="button" class="btn btn-success me-2" (click)="saveToDB()">
+      <button type="button" class="btn btn-success m-1" (click)="saveToDB()">
         <i class="bi bi-floppy"></i> Save to DB
       </button>
     </div>
