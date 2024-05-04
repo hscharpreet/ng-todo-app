@@ -12,12 +12,6 @@ h1 {
   max-width: 300px;
 }
 
-#delete,
-#edit,
-#save {
-  width: 60px;
-}
-
 .edit {
   border: solid 2px orange;
 }
@@ -30,4 +24,16 @@ h1 {
 .crossed {
   text-decoration: line-through;
   font-weight: normal;
+}
+
+.action-button-group {
+  width: 80px;
+}
+
+.action-button-group .btn {
+  padding: 4px 6px;
+}
+
+.action-button-group .btn:first-child {
+  padding: 4px 16px;
 }

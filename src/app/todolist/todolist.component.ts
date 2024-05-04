@@ -26,6 +26,8 @@ export class TodolistComponent implements OnInit {
   nextId = 0;
   previousStates: Task[][] = [];
   futureStates: Task[][] = [];
+  showMore = false;
+  isLargeScreen = false;
 
   @ViewChildren('taskInput') taskInputs: QueryList<ElementRef> | undefined;
 
@@ -40,6 +42,8 @@ export class TodolistComponent implements OnInit {
 
   ngOnInit() {
     this.loadTasks();
+    this.isLargeScreen = window.innerWidth > 768;
+    this.showMore = this.isLargeScreen;
   }
 
   onSubmit(taskForm: NgForm) {

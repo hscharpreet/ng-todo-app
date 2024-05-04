@@ -1,9 +1,9 @@
 <div class="container">
-  <h1 class="mt-4">To-Do Application</h1>
+  <h1 class="mt-4">Todo list</h1>
   <hr />
   <form (ngSubmit)="onSubmit(taskForm)" #taskForm="ngForm" class="mt-4">
     <div class="form-group row justify-content-center">
-      <div class="col-6">
+      <div class="col-8 col-md-6">
         <input
           type="text"
           class="form-control col-10"
@@ -21,7 +21,7 @@
           * Required Field
         </small>
       </div>
-      <div class="col-2">
+      <div class="col-4 col-md-2 w-auto">
         <button
           type="submit"
           class="btn btn-primary col"
@@ -42,7 +42,7 @@
       class="form-group row justify-content-center mt-2"
       *ngIf="!t.isArchived"
     >
-      <div class="col-4">
+      <div class="col-8 col-md-4">
         <input
           #taskInput
           type="text"
@@ -57,11 +57,11 @@
           (keyup.enter)="onSave(t.id, taskInput.value)"
         />
       </div>
-      <div class="col-2">
-        <div class="btn-group mr-2" role="group" style="width: 160px">
+      <div class="col-4 col-md-2">
+        <div class="btn-group mr-2 action-button-group" role="group">
           <button
             type="button"
-            class="btn btn-outline-success w-50"
+            class="btn btn-outline-success"
             (click)="onCheck(t.id)"
             *ngIf="!t.isCompleted"
           >
@@ -69,7 +69,7 @@
           </button>
           <button
             type="button"
-            class="btn btn-outline-warning w-50"
+            class="btn btn-outline-warning"
             (click)="onCheck(t.id)"
             *ngIf="t.isCompleted"
           >
@@ -77,7 +77,7 @@
           </button>
           <button
             type="button"
-            class="btn btn-outline-primary w-25"
+            class="btn btn-outline-primary"
             (click)="onEdit(t.id)"
             *ngIf="!t.isEditable"
           >
@@ -85,7 +85,7 @@
           </button>
           <button
             type="button"
-            class="btn btn-outline-warning w-25"
+            class="btn btn-outline-warning"
             (click)="onSave(t.id, taskInput.value)"
             *ngIf="t.isEditable"
           >
@@ -93,7 +93,7 @@
           </button>
           <button
             type="button"
-            class="btn btn-outline-danger w-25"
+            class="btn btn-outline-danger"
             (click)="onDelete(t.id)"
           >
             <i class="bi bi-trash3"></i>
@@ -110,7 +110,7 @@
       class="form-group row justify-content-center mt-2"
       *ngIf="t.isArchived"
     >
-      <div class="col-4">
+      <div class="col-8 col-md-4">
         <input
           #taskInput
           type="text"
@@ -125,18 +125,18 @@
           (keyup.enter)="onSave(t.id, taskInput.value)"
         />
       </div>
-      <div class="col-2">
-        <div class="btn-group mr-2" role="group" style="width: 160px">
+      <div class="col-4 col-md-2">
+        <div class="btn-group mr-2 action-button-group" role="group">
           <button
             type="button"
-            class="btn btn-outline-warning w-50"
+            class="btn btn-outline-warning"
             (click)="onUndoCheck(t.id)"
           >
             <i class="bi bi-arrow-up-square"></i>
           </button>
           <button
             type="button"
-            class="btn btn-outline-primary w-25"
+            class="btn btn-outline-primary"
             (click)="onEdit(t.id)"
             *ngIf="!t.isEditable"
           >
@@ -144,7 +144,7 @@
           </button>
           <button
             type="button"
-            class="btn btn-outline-warning w-25"
+            class="btn btn-outline-warning"
             (click)="onSave(t.id, taskInput.value)"
             *ngIf="t.isEditable"
           >
@@ -152,7 +152,7 @@
           </button>
           <button
             type="button"
-            class="btn btn-outline-danger w-25"
+            class="btn btn-outline-danger"
             (click)="onDelete(t.id)"
           >
             <i class="bi bi-trash3"></i>
@@ -164,8 +164,8 @@
 </div>
 
 <div class="fixed-bottom bg-secondary-subtle">
-  <div class="btn-toolbar justify-content-center mb-2 mt-2">
-    <div class="btn-group-sm" role="group">
+  <div class="btn-toolbar justify-content-center mb-2">
+    <div class="btn-group-sm mt-2" role="group">
       <button
         type="button"
         class="btn btn-primary me-2"
@@ -184,17 +184,31 @@
       </button>
       <button
         type="button"
-        class="btn btn-success me-2"
-        (click)="refreshTasks()"
+        class="btn btn-warning me-2"
+        (click)="moveCompletedToArchive()"
       >
-        <i class="bi bi-arrow-clockwise"></i> Refresh
+        <i class="bi bi-arrow-down-square"></i> Archive
       </button>
       <button
         type="button"
         class="btn btn-warning me-2"
-        (click)="moveCompletedToArchive()"
+        (click)="showMore = !showMore"
+        *ngIf="!isLargeScreen"
       >
-        <i class="bi bi-arrow-down-square"></i> Move Complete
+        <i
+          class="bi"
+          [ngClass]="showMore ? 'bi-chevron-down' : 'bi-chevron-up'"
+        ></i>
+        {{ showMore ? "Less" : "More" }}
+      </button>
+    </div>
+    <div *ngIf="showMore" class="btn-group-sm mt-2" role="group">
+      <button
+        type="button"
+        class="btn btn-success me-2"
+        (click)="refreshTasks()"
+      >
+        <i class="bi bi-arrow-clockwise"></i> Refresh
       </button>
       <button
         type="button"
