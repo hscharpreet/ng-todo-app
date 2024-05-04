@@ -5,8 +5,12 @@ import {
   OnInit,
   QueryList,
   ViewChildren,
+  inject,
 } from '@angular/core';
+import { Firestore, collectionData } from '@angular/fire/firestore';
 import { NgForm } from '@angular/forms';
+import { collection } from 'firebase/firestore';
+import { Observable } from 'rxjs';
 
 interface Task {
   id: number;
@@ -40,10 +44,23 @@ export class TodolistComponent implements OnInit {
     }
   }
 
+  firestore = inject(Firestore);
+  todoCollection = collection(this.firestore, 'todos');
+
+  getTodos(): Observable<any> {
+    return collectionData(this.todoCollection, {
+      idField: 'id',
+    });
+  }
+
   ngOnInit() {
     this.loadTasks();
     this.isLargeScreen = window.innerWidth > 768;
     this.showMore = this.isLargeScreen;
+
+    this.getTodos().subscribe((todos: Task[]) => {
+      console.log(todos);
+    });
   }
 
   onSubmit(taskForm: NgForm) {
