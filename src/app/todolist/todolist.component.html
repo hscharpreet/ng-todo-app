@@ -1,5 +1,12 @@
 <div class="container">
-  <h1 class="mt-4">Todo list</h1>
+  <h1>
+    To-do list<i
+      class="bi bi-cloud-arrow-up ms-2"
+      *ngIf="!isSaved"
+      (click)="saveAndCopyUrl()"
+    ></i>
+    <i class="bi bi-check2-circle ms-2" *ngIf="isSaved"></i>
+  </h1>
   <hr />
   <form (ngSubmit)="onSubmit(taskForm)" #taskForm="ngForm" class="mt-4">
     <div class="form-group row justify-content-center">
@@ -223,6 +230,9 @@
         (click)="deleteAllTasks()"
       >
         <i class="bi bi-trash3-fill"></i> Delete All
+      </button>
+      <button type="button" class="btn btn-success me-2" (click)="saveToDB()">
+        <i class="bi bi-floppy"></i> Save to DB
       </button>
     </div>
   </div>

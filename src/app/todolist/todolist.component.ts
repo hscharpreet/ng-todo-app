@@ -5,12 +5,11 @@ import {
   OnInit,
   QueryList,
   ViewChildren,
-  inject,
 } from '@angular/core';
-import { Firestore, collectionData } from '@angular/fire/firestore';
+import { Firestore } from '@angular/fire/firestore';
 import { NgForm } from '@angular/forms';
-import { collection } from 'firebase/firestore';
-import { Observable } from 'rxjs';
+import { setDoc, doc, getDoc } from 'firebase/firestore';
+import { ActivatedRoute, Router } from '@angular/router';
 
 interface Task {
   id: number;
@@ -32,6 +31,8 @@ export class TodolistComponent implements OnInit {
   futureStates: Task[][] = [];
   showMore = false;
   isLargeScreen = false;
+  idFromUrl: string = '';
+  isSaved = false;
 
   @ViewChildren('taskInput') taskInputs: QueryList<ElementRef> | undefined;
 
@@ -44,22 +45,43 @@ export class TodolistComponent implements OnInit {
     }
   }
 
-  firestore = inject(Firestore);
-  todoCollection = collection(this.firestore, 'todos');
+  constructor(
+    private firestore: Firestore,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
-  getTodos(): Observable<any> {
-    return collectionData(this.todoCollection, {
-      idField: 'id',
-    });
+  async saveToDB() {
+    try {
+      if (!this.idFromUrl) {
+        this.idFromUrl = Math.random().toString(16).substr(2, 8);
+        this.router.navigate(['/', this.idFromUrl]);
+      }
+
+      const docRef = doc(this.firestore, 'todos', this.idFromUrl);
+      await setDoc(docRef, { tasks: this.taskArray });
+      console.log('Document written with ID: ', this.idFromUrl);
+    } catch (e) {
+      console.error('Error adding document: ', e);
+    }
+  }
+
+  async saveAndCopyUrl() {
+    await this.saveToDB();
+    navigator.clipboard.writeText(window.location.href);
+    this.isSaved = true;
+    setTimeout(() => {
+      this.isSaved = false;
+    }, 2000);
   }
 
   ngOnInit() {
-    this.loadTasks();
     this.isLargeScreen = window.innerWidth > 768;
     this.showMore = this.isLargeScreen;
 
-    this.getTodos().subscribe((todos: Task[]) => {
-      console.log(todos);
+    this.route.params.subscribe((params) => {
+      this.idFromUrl = params['id'];
+      this.loadTasks();
     });
   }
 
@@ -161,7 +183,7 @@ export class TodolistComponent implements OnInit {
   undo() {
     if (this.previousStates.length > 0) {
       this.futureStates.push(JSON.parse(JSON.stringify(this.taskArray)));
-      this.taskArray = this.previousStates.pop() as Task[]; // Add type assertion
+      this.taskArray = this.previousStates.pop() as Task[];
       this.saveTasks();
     }
   }
@@ -169,7 +191,7 @@ export class TodolistComponent implements OnInit {
   redo() {
     if (this.futureStates.length > 0) {
       this.previousStates.push(JSON.parse(JSON.stringify(this.taskArray)));
-      this.taskArray = this.futureStates.pop() as Task[]; // Add type assertion
+      this.taskArray = this.futureStates.pop() as Task[];
       this.saveTasks();
     }
   }
@@ -178,7 +200,26 @@ export class TodolistComponent implements OnInit {
     localStorage.setItem('tasks', JSON.stringify(this.taskArray));
   }
 
-  loadTasks() {
+  async loadTasks() {
+    if (this.idFromUrl) {
+      const docRef = doc(this.firestore, 'todos', this.idFromUrl);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        this.taskArray = docSnap.data()['tasks'];
+        this.nextId =
+          this.taskArray.length > 0
+            ? Math.max(...this.taskArray.map((t) => t.id)) + 1
+            : 0;
+      } else {
+        this.loadTasksFromLocalStorage();
+      }
+    } else {
+      this.loadTasksFromLocalStorage();
+    }
+  }
+
+  loadTasksFromLocalStorage() {
     const storedTasks = localStorage.getItem('tasks');
     if (storedTasks) {
       this.taskArray = JSON.parse(storedTasks);
