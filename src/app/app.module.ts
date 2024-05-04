@@ -7,7 +7,7 @@ import { TodolistComponent } from './todolist/todolist.component';
 import { FormsModule } from '@angular/forms';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
-import { environment } from '../../environments/environment';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent, TodolistComponent],
