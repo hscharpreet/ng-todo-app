@@ -8,20 +8,24 @@ import {
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
+interface Task {
+  id: number;
+  taskName: string;
+  isCompleted: boolean;
+  isEditable: boolean;
+  isArchived: boolean;
+}
+
 @Component({
   selector: 'app-todolist',
   templateUrl: './todolist.component.html',
   styleUrls: ['./todolist.component.css'],
 })
 export class TodolistComponent implements OnInit {
-  taskArray: {
-    id: number;
-    taskName: string;
-    isCompleted: boolean;
-    isEditable: boolean;
-    isArchived: boolean;
-  }[] = [];
+  taskArray: Task[] = [];
   nextId = 0;
+  previousStates: Task[][] = [];
+  futureStates: Task[][] = [];
 
   @ViewChildren('taskInput') taskInputs: QueryList<ElementRef> | undefined;
 
@@ -34,29 +38,20 @@ export class TodolistComponent implements OnInit {
     }
   }
 
-  previousStates: any[] = [];
-  futureStates: any[] = [];
-
   ngOnInit() {
-    const storedTasks = localStorage.getItem('tasks');
-    if (storedTasks) {
-      this.taskArray = JSON.parse(storedTasks);
-      this.nextId =
-        this.taskArray.length > 0
-          ? Math.max(...this.taskArray.map((t) => t.id)) + 1
-          : 0;
-    }
+    this.loadTasks();
   }
 
   onSubmit(taskForm: NgForm) {
     this.savePreviousState();
-    this.taskArray.push({
+    const newTask: Task = {
       id: this.nextId++,
       taskName: taskForm.value.task,
       isCompleted: false,
       isEditable: false,
       isArchived: false,
-    });
+    };
+    this.taskArray.push(newTask);
     taskForm.reset();
     this.saveTasks();
   }
@@ -112,12 +107,7 @@ export class TodolistComponent implements OnInit {
   }
 
   refreshTasks() {
-    const storedTasks = localStorage.getItem('tasks');
-    if (storedTasks) {
-      this.taskArray = JSON.parse(storedTasks);
-    } else {
-      this.taskArray = [];
-    }
+    this.loadTasks();
     console.log(this.taskArray);
   }
 
@@ -132,11 +122,13 @@ export class TodolistComponent implements OnInit {
   }
 
   deleteArchivedTasks() {
+    this.savePreviousState();
     this.taskArray = this.taskArray.filter((task) => !task.isArchived);
     this.saveTasks();
   }
 
   deleteAllTasks() {
+    this.savePreviousState();
     this.taskArray = [];
     this.saveTasks();
   }
@@ -148,7 +140,7 @@ export class TodolistComponent implements OnInit {
   undo() {
     if (this.previousStates.length > 0) {
       this.futureStates.push(JSON.parse(JSON.stringify(this.taskArray)));
-      this.taskArray = this.previousStates.pop();
+      this.taskArray = this.previousStates.pop() as Task[]; // Add type assertion
       this.saveTasks();
     }
   }
@@ -156,12 +148,26 @@ export class TodolistComponent implements OnInit {
   redo() {
     if (this.futureStates.length > 0) {
       this.previousStates.push(JSON.parse(JSON.stringify(this.taskArray)));
-      this.taskArray = this.futureStates.pop();
+      this.taskArray = this.futureStates.pop() as Task[]; // Add type assertion
       this.saveTasks();
     }
   }
 
   saveTasks() {
     localStorage.setItem('tasks', JSON.stringify(this.taskArray));
+  }
+
+  loadTasks() {
+    const storedTasks = localStorage.getItem('tasks');
+    if (storedTasks) {
+      this.taskArray = JSON.parse(storedTasks);
+      this.nextId =
+        this.taskArray.length > 0
+          ? Math.max(...this.taskArray.map((t) => t.id)) + 1
+          : 0;
+    } else {
+      this.taskArray = [];
+      this.nextId = 0;
+    }
   }
 }

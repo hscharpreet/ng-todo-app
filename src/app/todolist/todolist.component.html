@@ -13,6 +13,13 @@
           name="task"
           required
         />
+        <small
+          id="errorMessage"
+          class="form-text text-danger mt-1"
+          *ngIf="taskForm.dirty && taskForm.invalid"
+        >
+          * Required Field
+        </small>
       </div>
       <div class="col-2">
         <button
@@ -23,13 +30,6 @@
           Submit
         </button>
       </div>
-      <small
-        id="errorMessage"
-        class="form-text text-danger mt-1"
-        *ngIf="taskForm.dirty && taskForm.invalid"
-      >
-        Required Field
-      </small>
     </div>
   </form>
 
@@ -58,14 +58,14 @@
         />
       </div>
       <div class="col-2">
-        <div class="btn-group mr-2" role="group" style="width: 250px">
+        <div class="btn-group mr-2" role="group" style="width: 160px">
           <button
             type="button"
             class="btn btn-outline-success w-50"
             (click)="onCheck(t.id)"
             *ngIf="!t.isCompleted"
           >
-            Done
+            <i class="bi bi-check-circle-fill"></i>
           </button>
           <button
             type="button"
@@ -73,7 +73,7 @@
             (click)="onCheck(t.id)"
             *ngIf="t.isCompleted"
           >
-            UnCheck
+            <i class="bi bi-check-circle"></i>
           </button>
           <button
             type="button"
@@ -81,7 +81,7 @@
             (click)="onEdit(t.id)"
             *ngIf="!t.isEditable"
           >
-            Edit
+            <i class="bi bi-pencil"></i>
           </button>
           <button
             type="button"
@@ -89,14 +89,14 @@
             (click)="onSave(t.id, taskInput.value)"
             *ngIf="t.isEditable"
           >
-            Save
+            <i class="bi bi-floppy"></i>
           </button>
           <button
             type="button"
             class="btn btn-outline-danger w-25"
             (click)="onDelete(t.id)"
           >
-            Del
+            <i class="bi bi-trash3"></i>
           </button>
         </div>
       </div>
@@ -104,45 +104,6 @@
   </div>
 
   <h2 class="text-center display-6 mt-5">Archived Tasks</h2>
-
-  <div class="btn-toolbar justify-content-center">
-    <div class="btn-group-sm" role="group">
-      <button type="button" class="btn btn-primary me-2" (click)="undo()">
-        Undo Actions
-      </button>
-      <button type="button" class="btn btn-primary me-2" (click)="redo()">
-        Redo Actions
-      </button>
-      <button
-        type="button"
-        class="btn btn-success me-2"
-        (click)="refreshTasks()"
-      >
-        Refresh Tasks
-      </button>
-      <button
-        type="button"
-        class="btn btn-warning me-2"
-        (click)="moveCompletedToArchive()"
-      >
-        Move Complete to Archive
-      </button>
-      <button
-        type="button"
-        class="btn btn-warning me-2"
-        (click)="deleteArchivedTasks()"
-      >
-        Delete Archived tasks
-      </button>
-      <button
-        type="button"
-        class="btn btn-danger me-2"
-        (click)="deleteAllTasks()"
-      >
-        Delete All
-      </button>
-    </div>
-  </div>
 
   <div class="col" *ngFor="let t of taskArray; index as i">
     <div
@@ -165,13 +126,13 @@
         />
       </div>
       <div class="col-2">
-        <div class="btn-group mr-2" role="group" style="width: 250px">
+        <div class="btn-group mr-2" role="group" style="width: 160px">
           <button
             type="button"
             class="btn btn-outline-warning w-50"
             (click)="onUndoCheck(t.id)"
           >
-            Undo
+            <i class="bi bi-arrow-up-square"></i>
           </button>
           <button
             type="button"
@@ -179,7 +140,7 @@
             (click)="onEdit(t.id)"
             *ngIf="!t.isEditable"
           >
-            Edit
+            <i class="bi bi-pencil"></i>
           </button>
           <button
             type="button"
@@ -187,17 +148,68 @@
             (click)="onSave(t.id, taskInput.value)"
             *ngIf="t.isEditable"
           >
-            Save
+            <i class="bi bi-floppy"></i>
           </button>
           <button
             type="button"
             class="btn btn-outline-danger w-25"
             (click)="onDelete(t.id)"
           >
-            Del
+            <i class="bi bi-trash3"></i>
           </button>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="fixed-bottom bg-secondary-subtle">
+  <div class="btn-toolbar justify-content-center mb-2 mt-2">
+    <div class="btn-group-sm" role="group">
+      <button
+        type="button"
+        class="btn btn-primary me-2"
+        (click)="undo()"
+        [disabled]="previousStates.length === 0"
+      >
+        <i class="bi bi-arrow-90deg-left"></i> Undo
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary me-2"
+        (click)="redo()"
+        [disabled]="futureStates.length === 0"
+      >
+        <i class="bi bi-arrow-90deg-right"></i> Redo
+      </button>
+      <button
+        type="button"
+        class="btn btn-success me-2"
+        (click)="refreshTasks()"
+      >
+        <i class="bi bi-arrow-clockwise"></i> Refresh
+      </button>
+      <button
+        type="button"
+        class="btn btn-warning me-2"
+        (click)="moveCompletedToArchive()"
+      >
+        <i class="bi bi-arrow-down-square"></i> Move Complete
+      </button>
+      <button
+        type="button"
+        class="btn btn-warning me-2"
+        (click)="deleteArchivedTasks()"
+      >
+        <i class="bi bi-trash3"></i> Delete Archived
+      </button>
+      <button
+        type="button"
+        class="btn btn-danger me-2"
+        (click)="deleteAllTasks()"
+      >
+        <i class="bi bi-trash3-fill"></i> Delete All
+      </button>
     </div>
   </div>
 </div>
